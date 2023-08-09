@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "opentargets2wikidata"
+version = "0.1.0"
+description = "Connectors from Open Targets dumps to RDF and Wikidata"
+authors = ["Tiago Lubiana <tiago.lubiana.alves@usp.br>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pyarrow = "^12.0.1"
+pandas = "^2.0.3"
+wdcuration = "^0.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
