@@ -87,6 +87,8 @@ wbi = WikibaseIntegrator(login=login_instance)
 
 # Iterate over the DataFrame grouped by disease to batch add claims for each disease
 for diseaseId, group in df.groupby("diseaseId"):
+    if diseaseId != "MONDO_0000463":
+        continue
     disease_wd = all_diseases_to_qid.get(diseaseId)
 
     if not disease_wd:
@@ -125,7 +127,7 @@ for diseaseId, group in df.groupby("diseaseId"):
             value=target_wd,
             references=references,
         )
-        item.claims.add(claim, action_if_exists=ActionIfExists.APPEND_OR_REPLACE)
+        item.claims.add(claim, action_if_exists=ActionIfExists.MERGE_REFS_OR_APPEND)
 
         # Create the claim in reverse for the target item
         target_item = wbi.item.get(entity_id=target_wd)
@@ -135,7 +137,7 @@ for diseaseId, group in df.groupby("diseaseId"):
             references=references,
         )
         target_item.claims.add(
-            inverse_claim, action_if_exists=ActionIfExists.APPEND_OR_REPLACE
+            inverse_claim, action_if_exists=ActionIfExists.MERGE_REFS_OR_APPEND
         )
         target_item.write(summary="Update genetic associations from Open Targets.")
 
