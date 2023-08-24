@@ -2,6 +2,10 @@ import csv
 import pandas as pd
 from pathlib import Path
 
+HERE = Path(__file__).parent.resolve()
+DATA = HERE.parent.joinpath("data").resolve()
+RESULTS = HERE.parent.joinpath("results").resolve()
+
 
 def write_tsv(output_file, rows):
     with output_file.open("w", newline="") as tsvfile:
@@ -27,8 +31,8 @@ def extract_linked_targets(molecule_dir):
 
 
 def main():
-    output_file = Path("linkedTargets.tsv")
-    molecule_dir = Path(__file__).parent.parent / "data" / "molecule"
+    output_file = RESULTS / "linkedTargets.tsv"
+    molecule_dir = DATA / "molecule"
     rows = extract_linked_targets(molecule_dir)
     write_tsv(output_file, rows)
 

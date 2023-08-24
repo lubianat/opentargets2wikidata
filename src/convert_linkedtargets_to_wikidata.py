@@ -7,7 +7,11 @@ from wdcuration import lookup_multiple_ids, query_wikidata
 from pathlib import Path
 import logging
 from rdflib.namespace import Namespace
+from pathlib import Path
 
+HERE = Path(__file__).parent.resolve()
+DATA = HERE.parent.joinpath("data").resolve()
+RESULTS = HERE.parent.joinpath("results").resolve()
 
 # Configure logging
 logging.basicConfig(filename="unmatched_chembl_ids.log", level=logging.INFO)
@@ -72,7 +76,7 @@ def get_encoded_proteins(target_qids, chunk_size=200):
     return encoded_proteins
 
 
-def run_graphql_query(drug_id):
+def run_drug_mechanism_graphql_query(drug_id):
     url = "https://api.platform.opentargets.org/api/v4/graphql"
     query = """
     query MechanismsOfActionSectionQuery($chemblId: String!) {
@@ -134,7 +138,7 @@ def create_rdf(drug_ids, target_ids):
         try:
             drug_qid = drug_qids[drug_id]
 
-            response = run_graphql_query(drug_id)
+            response = run_drug_mechanism_graphql_query(drug_id)
             if response["data"]["drug"]["mechanismsOfAction"] is None:
                 continue
             for row in response["data"]["drug"]["mechanismsOfAction"]["rows"]:
@@ -162,8 +166,8 @@ def create_rdf(drug_ids, target_ids):
 
 
 def main():
-    input_file = Path("linkedTargets.tsv")
-    output_file = Path("linkedTargets.ttl")
+    input_file = RESULTS / "linkedTargets.tsv"
+    output_file = RESULTS / "linkedTargets.ttl"
 
     drug_ids, target_ids = read_tsv(input_file)
     rdf_graph = create_rdf(drug_ids, target_ids)
