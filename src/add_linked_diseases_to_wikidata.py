@@ -14,7 +14,16 @@ from pathlib import Path
 HERE = Path(__file__).parent.resolve()
 DATA = HERE.parent.joinpath("data").resolve()
 RESULTS = HERE.parent.joinpath("results").resolve()
-logging.basicConfig(level=logging.INFO)
+# Define the path to the log file
+LOG_FILE = HERE.parent.joinpath("logs", "script_log.log").resolve()
+
+# Configure logging to write logs to a file
+logging.basicConfig(
+    filename=LOG_FILE,
+    filemode="a",
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
+)
 
 CACHE_FILE = HERE / "dicts" / "id_mappings.json"
 CACHE_DURATION = 259200  # 3 days in seconds
@@ -88,6 +97,7 @@ wbi = WikibaseIntegrator(login=login_instance)
 from tqdm import tqdm
 
 # Iterate over the DataFrame grouped by disease to batch add claims for each disease
+
 for diseaseId, group in tqdm(df.groupby("diseaseId")):
     disease_wd = all_diseases_to_qid.get(diseaseId)
 
@@ -139,7 +149,9 @@ for diseaseId, group in tqdm(df.groupby("diseaseId")):
         target_item.claims.add(
             inverse_claim, action_if_exists=ActionIfExists.MERGE_REFS_OR_APPEND
         )
-        target_item.write(summary="Update genetic associations from Open Targets.")
+        if "ak" not in item.get_json()["labels"]:
+            target_item.write(summary="Update genetic associations from Open Targets.")
 
-    # Write the item after adding all claims for this disease
-    item.write(summary="Update genetic associations from Open Targets.")
+    if "ak" not in item.get_json()["labels"]:
+        # Write the item after adding all claims for this disease
+        item.write(summary="Update genetic associations from Open Targets.")
