@@ -66,10 +66,12 @@ def get_encoded_proteins(target_qids, chunk_size=200):
             gene_qid = result["gene"].split("/")[-1]
             protein_qid = result["protein"].split("/")[-1]
 
-            if gene_qid in encoded_proteins or gene_qid in multiple_protein_genes:
+            if gene_qid in encoded_proteins:
                 # Removing the key-value pair from the dictionary
                 encoded_proteins.pop(gene_qid, None)
                 multiple_protein_genes.append(gene_qid)
+            if gene_qid in multiple_protein_genes:
+                continue
             encoded_proteins[gene_qid] = protein_qid
         sleep(0.3)
 
@@ -122,9 +124,11 @@ def create_rdf(drug_ids, target_ids):
     target_ids_for_lookup = list(set(target_ids))
 
     # Lookup Wikidata QIDs for the drug and target IDs using cache
-    drug_qids = lookup_with_cache(drug_ids_for_lookup, "P592", "drug_qids_cache.pkl")
+    drug_qids = lookup_with_cache(
+        drug_ids_for_lookup, "P592", RESULTS / "drug_qids_cache.pkl"
+    )
     target_qids = lookup_with_cache(
-        target_ids_for_lookup, "P594", "target_qids_cache.pkl"
+        target_ids_for_lookup, "P594", RESULTS / "target_qids_cache.pkl"
     )
 
     # Lookup encoded proteins for all target QIDs in chunks

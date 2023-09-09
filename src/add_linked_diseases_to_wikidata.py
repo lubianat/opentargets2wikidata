@@ -85,10 +85,10 @@ login_instance = wbi_login.Clientlogin(user=USER, password=PASS)
 wbi = WikibaseIntegrator(login=login_instance)
 
 
+from tqdm import tqdm
+
 # Iterate over the DataFrame grouped by disease to batch add claims for each disease
-for diseaseId, group in df.groupby("diseaseId"):
-    if diseaseId != "MONDO_0000463":
-        continue
+for diseaseId, group in tqdm(df.groupby("diseaseId")):
     disease_wd = all_diseases_to_qid.get(diseaseId)
 
     if not disease_wd:
